@@ -1,31 +1,28 @@
 from django.conf import settings
+from main.models import Users
+from main.models import Vehicle
 import requests
-import json
-import random
 
 
-postcodes = [
-	"SW1A 1AA",
-	"PE35 6EB", 
-	"CV34 6AH",
-	"EH1 2NG"
-]
+users_url = "https://api-us.nextgen.teletracnavman.net:8067/v1/users?status=ALL&pruning=B2B&key=bf6438440fb142d89d13f067a2cd76b3"
 
+vehicles_url = "https://api-us.nextgen.teletracnavman.net:8067/v1/vehicles?status=ALL&pruning=B2B&key=bf6438440fb142d89d13f067a2cd76b3"
 def schedule_api():
 
-	postcode = postcodes[random.randint(0, 3)]
+	users_request = requests.get(users_url)
+	if users_request.status_code == 200:
+		result = users_request.json()
+		users = Users.objects.create()
+		users.json = result.copy()
+		users.save()
 
-	full_url = f"https://api.postcodes.io/postcodes/{postcode}"
-			
-	r = requests.get(full_url)
-	if r.status_code == 200:
+	vehicles_request = requests.get(vehicles_url)
+	if vehicles_request.status_code == 200:
+		result = vehicles_request.json()
+		vehicles = Vehicle.objects.create()
+		vehicles.json = result.copy()
+		vehicles.save()
 
-		result = r.json()["result"]
 
-		lat = result["latitude"]
-		lng = result["longitude"]
 
-		print(f'Latitude: {lat}, Longitude: {lng}')
-
-		#77779
 
